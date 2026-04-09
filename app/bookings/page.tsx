@@ -1,18 +1,15 @@
 import type { Metadata } from 'next'
 import ContactForm from '@/components/ContactForm'
+import CalBooking from '@/components/CalBooking'
 
 export const metadata: Metadata = {
   title: 'Bookings — Raz Photography',
   description: 'Book a photography session with Raz. Nature, landscape, events and concerts.',
 }
 
-// TODO: Set NEXT_PUBLIC_CALENDLY_URL in your .env.local file
-const calendlyUrl =
-  process.env.NEXT_PUBLIC_CALENDLY_URL || 'https://calendly.com/razphotography'
-
 export default function BookingsPage() {
   return (
-    <section className="max-w-3xl mx-auto px-6 py-24">
+    <section className="max-w-7xl mx-auto px-6 py-24">
       {/* Header */}
       <div className="mb-12">
         <p className="text-[10px] tracking-[0.3em] uppercase text-[#888888] mb-4 font-light">
@@ -32,37 +29,32 @@ export default function BookingsPage() {
         </p>
       </div>
 
-      {/* Calendly embed */}
-      <div className="mb-16">
-        <h2 className="font-[family-name:var(--font-cormorant)] font-light text-2xl text-[#111111] tracking-wide mb-6">
-          Schedule a Time
-        </h2>
-        {/* TODO: Set NEXT_PUBLIC_CALENDLY_URL=your-actual-url in .env.local */}
-        <iframe
-          src={calendlyUrl}
-          width="100%"
-          height="700"
-          frameBorder="0"
-          title="Schedule a session with Raz Photography"
-          className="border border-gray-100"
-        />
-      </div>
+      {/* Side-by-side on desktop, stacked on mobile */}
+      <div className="flex flex-col md:flex-row md:gap-16 md:items-start">
+        {/* Cal.com embed */}
+        <div className="flex-1 mb-16 md:mb-0">
+          <h2 className="font-[family-name:var(--font-cormorant)] font-light text-2xl text-[#111111] tracking-wide mb-6">
+            Schedule a Time
+          </h2>
+          <CalBooking />
+        </div>
 
-      {/* Divider */}
-      <div className="flex items-center gap-4 my-10">
-        <div className="flex-1 h-px bg-gray-100" />
-        <span className="text-[10px] tracking-[0.2em] uppercase text-[#888888] font-light">
-          or reach out directly
-        </span>
-        <div className="flex-1 h-px bg-gray-100" />
-      </div>
+        {/* Divider — horizontal on mobile, vertical on desktop */}
+        <div className="flex md:flex-col items-center md:items-stretch gap-4 my-10 md:my-0">
+          <div className="flex-1 h-px md:h-auto md:w-px bg-gray-100" />
+          <span className="text-[10px] tracking-[0.2em] uppercase text-[#888888] font-light whitespace-nowrap md:[writing-mode:vertical-lr] md:rotate-180">
+            or reach out directly
+          </span>
+          <div className="flex-1 h-px md:h-auto md:w-px bg-gray-100" />
+        </div>
 
-      {/* Fallback contact form */}
-      <div>
-        <h2 className="font-[family-name:var(--font-cormorant)] font-light text-2xl text-[#111111] tracking-wide mb-8">
-          Send a Message
-        </h2>
-        <ContactForm simplified />
+        {/* Contact form */}
+        <div className="md:w-80 lg:w-96">
+          <h2 className="font-[family-name:var(--font-cormorant)] font-light text-2xl text-[#111111] tracking-wide mb-8">
+            Send a Message
+          </h2>
+          <ContactForm simplified />
+        </div>
       </div>
     </section>
   )
