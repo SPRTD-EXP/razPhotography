@@ -2,17 +2,23 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { useCart } from '@/lib/cart-store'
+import CartDrawer from './CartDrawer'
 
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/about', label: 'About' },
   { href: '/bookings', label: 'Bookings' },
+  { href: '/prints', label: 'Prints' },
   { href: '/contact', label: 'Contact' },
 ]
 
 export default function Nav() {
   const [open, setOpen] = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
+  const { items } = useCart()
+  const count = items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
@@ -50,7 +56,24 @@ export default function Nav() {
               <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
             </svg>
           </a>
+          <button
+            onClick={() => setCartOpen(true)}
+            className="relative text-[#888888] hover:text-[#111111] transition-colors duration-200"
+            aria-label="Open cart"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+            {count > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-[#111111] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
+                {count}
+              </span>
+            )}
+          </button>
         </div>
+        <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
 
         {/* Mobile hamburger */}
         <button

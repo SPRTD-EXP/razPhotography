@@ -18,6 +18,8 @@ export interface Photo {
   }
   category: 'Nature/Landscape' | 'Events/Concerts'
   order: number
+  availableAsPrint?: boolean
+  printTitle?: string
 }
 
 // Placeholder photos for dev (shown when Sanity is not connected)

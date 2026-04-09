@@ -3,6 +3,7 @@ import { Cormorant_Garamond, DM_Sans } from 'next/font/google'
 import './globals.css'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
+import { CartProvider } from '@/lib/cart-store'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -42,9 +43,11 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body className="min-h-screen flex flex-col bg-white text-[#111111] antialiased">
-        <Nav />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <CartProvider>
+          <Nav />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   )

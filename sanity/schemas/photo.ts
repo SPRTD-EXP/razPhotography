@@ -48,6 +48,8 @@ export default {
       description: 'Lower numbers appear first (e.g. 1, 2, 3...)',
       initialValue: 99,
     },
+    { name: 'availableAsPrint', title: 'Available as Print', type: 'boolean', initialValue: false },
+    { name: 'printTitle', title: 'Print Display Title', type: 'string', description: 'Optional title override for prints page (defaults to title)' },
   ],
   preview: {
     select: {
