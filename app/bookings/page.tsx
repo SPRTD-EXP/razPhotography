@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import CalBooker from '@/components/CalBooker'
+import CalBooking from '@/components/CalBooking'
 
 export const metadata: Metadata = {
   title: 'Bookings — Raz Photography',
@@ -29,7 +29,7 @@ export default function BookingsPage() {
       </div>
 
       {/* Cal.com Atoms Booker */}
-      <CalBooker />
+      <CalBooking />
     </section>
   )
 }
