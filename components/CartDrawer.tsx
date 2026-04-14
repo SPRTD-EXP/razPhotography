@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { useCart } from '@/lib/cart-store'
 import { formatPrice } from '@/lib/print-products'
@@ -13,6 +14,9 @@ interface CartDrawerProps {
 export default function CartDrawer({ open, onClose }: CartDrawerProps) {
   const { items, removeItem, updateQty, total } = useCart()
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   const count = items.reduce((sum, item) => sum + item.quantity, 0)
 
@@ -33,19 +37,21 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
     }
   }
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <>
       {/* Backdrop */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40"
-          onClick={onClose}
-        />
-      )}
+      <div
+        className={`fixed inset-0 bg-black/60 z-[100] transition-opacity duration-300 ${
+          open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onClose}
+      />
 
       {/* Drawer */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 right-0 z-[101] w-full max-w-sm bg-white flex flex-col transition-transform duration-300 ease-in-out ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -70,17 +76,17 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="px-6 py-4">
           {items.length === 0 ? (
-            <div className="flex items-center justify-center h-full">
+            <div className="py-12 text-center">
               <p className="text-sm text-[#888888]">Your cart is empty.</p>
             </div>
           ) : (
             <ul>
               {items.map((item) => (
-                <li key={item.id} className="flex gap-3 py-4 border-b border-gray-100 last:border-0">
+                <li key={item.id} className="relative flex gap-4 py-5 border-b border-gray-100 last:border-0">
                   {/* Thumbnail */}
-                  <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden bg-[#F5F5F5]">
+                  <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden bg-[#F5F5F5]">
                     <Image
                       src={item.imageUrl}
                       alt={item.photoTitle}
@@ -90,43 +96,47 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                     />
                   </div>
 
+                  {/* Remove × */}
+                  <button
+                    onClick={() => removeItem(item.id)}
+                    className="absolute top-4 right-0 text-[#888888] hover:text-[#111111] transition-colors duration-200"
+                    aria-label="Remove item"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+
                   {/* Details */}
-                  <div className="flex flex-col gap-1 flex-1 min-w-0">
-                    <p className="text-sm font-light text-[#111111] truncate">{item.photoTitle}</p>
-                    <p className="text-xs text-[#888888]">{item.productLabel} &mdash; {item.sizeLabel}</p>
+                  <div className="flex flex-col gap-1.5 flex-1 min-w-0 pr-5">
+                    <p className="text-sm font-light text-[#111111] leading-snug">{item.photoTitle}</p>
+                    <p className="text-xs text-[#888888] leading-relaxed">
+                      {item.productLabel}<br />
+                      {item.sizeLabel}
+                    </p>
 
                     {/* Qty + price row */}
-                    <div className="flex items-center justify-between mt-1">
-                      {/* Qty controls */}
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-center gap-3">
                         <button
                           onClick={() => updateQty(item.id, Math.max(1, item.quantity - 1))}
-                          className="w-5 h-5 flex items-center justify-center text-[#888888] hover:text-[#111111] transition-colors border border-gray-200 text-xs"
+                          className="w-6 h-6 flex items-center justify-center text-[#888888] hover:text-[#111111] transition-colors border border-gray-200"
                           aria-label="Decrease quantity"
                         >
-                          -
+                          −
                         </button>
-                        <span className="text-xs text-[#111111] w-4 text-center">{item.quantity}</span>
+                        <span className="text-sm text-[#111111] w-4 text-center">{item.quantity}</span>
                         <button
                           onClick={() => updateQty(item.id, item.quantity + 1)}
-                          className="w-5 h-5 flex items-center justify-center text-[#888888] hover:text-[#111111] transition-colors border border-gray-200 text-xs"
+                          className="w-6 h-6 flex items-center justify-center text-[#888888] hover:text-[#111111] transition-colors border border-gray-200"
                           aria-label="Increase quantity"
                         >
                           +
                         </button>
                       </div>
-
-                      {/* Line price */}
-                      <span className="text-xs text-[#111111]">{formatPrice(item.price * item.quantity)}</span>
+                      <span className="text-sm font-light text-[#111111]">{formatPrice(item.price * item.quantity)}</span>
                     </div>
-
-                    {/* Remove */}
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-left text-[10px] text-[#888888] hover:text-[#111111] transition-colors duration-200 mt-0.5 w-fit"
-                    >
-                      Remove
-                    </button>
                   </div>
                 </li>
               ))}
@@ -150,6 +160,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
           </button>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   )
 }
